@@ -664,10 +664,6 @@ Then open: **http://localhost:8000**
 
 ⭐ **If you found this project useful, please give it a star on GitHub!** 🌟
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.12-orange.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey.svg)
 
 ## 📁 Emotion Recognition Project Structure
 
@@ -723,8 +719,10 @@ emotion_detection_project/
 
 ### **Emotion Recognition System (Facial & Text-based)**  
 
-This project detects human emotions from **facial expressions (via webcam)** and **text input** using a combination of **deep learning (CNN)** and **machine learning (NLP pipeline)** models.  
-It provides real-time emotion analysis with a beautiful, responsive web interface — without using Flask or FastAPI.  
+This project detects human emotions from **facial expressions (via webcam)** and **text input** 
+using a combination of **deep learning (CNN)** and **machine learning (NLP pipeline)** models.  
+It provides real-time emotion analysis with a beautiful, responsive web interface 
+— without using Flask or FastAPI.  
 
 #### 🎯 **Purpose**
 To create an AI system that understands human emotional states for use in:
