@@ -2,241 +2,929 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Emotion Recognition Dashboard 🌤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Emotion AI Dashboard 🧠</title>
 <style>
 :root {
-  --primary: #4dafff;
-  --primary-dark: #1e90ff;
-  --accent: #86c5ff;
-  --bg: linear-gradient(135deg, #eaf6ff, #bde0ff);
-  --fg: #0a0a0a;
-  --card-bg: #ffffffaa;
+  --primary: #6366f1;
+  --primary-light: #818cf8;
+  --primary-dark: #4f46e5;
+  --secondary: #ec4899;
+  --accent: #06b6d4;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-border: rgba(255, 255, 255, 0.18);
+  --text: #1f2937;
+  --text-light: #6b7280;
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.25);
+  --input-bg: rgba(255, 255, 255, 0.7);
+  --table-bg: rgba(255, 255, 255, 0.5);
+  --header-text: #ffffff;
 }
+
 body.dark {
-  --bg: linear-gradient(135deg, #0a0a0a, #222);
-  --fg: #f0f0f0;
-  --card-bg: #1e1e1ecc;
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  --card-bg: rgba(30, 41, 59, 0.9);
+  --card-border: rgba(148, 163, 184, 0.1);
+  --text: #f1f5f9;
+  --text-light: #94a3b4;
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.8);
+  --input-bg: rgba(51, 65, 85, 0.7);
+  --table-bg: rgba(51, 65, 85, 0.5);
+  --header-text: #e2e8f0;
 }
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: var(--bg);
-  color: var(--fg);
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  transition: background 0.5s, color 0.5s;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text);
+  min-height: 100vh;
   overflow-x: hidden;
+  transition: all 0.5s ease;
 }
-header {
-  background: var(--primary);
-  color: white;
-  text-align: center;
-  padding: 15px;
-  font-size: 24px;
-  font-weight: bold;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-}
-#toggleTheme {
+
+/* Animated background particles */
+.bg-particles {
   position: fixed;
-  top: 10px;
-  right: 20px;
-  border: none;
-  background: var(--primary-dark);
-  color: white;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
 }
-#toggleTheme:hover { opacity: 0.9; }
+
+.particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: float 20s infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+}
+
+header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--card-border);
+  padding: 4rem 2rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 10;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--header-text) 0%, #f0f0f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: color 0.5s ease;
+}
+
+header p {
+  color: var(--header-text);
+  font-size: 1.1rem;
+  opacity: 0.9;
+  transition: color 0.5s ease;
+}
+
+#toggleTheme {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+
+  width: auto;
+  min-width: 50px;
+  padding: 10px 14px;
+
+  border: none;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+
+  transition: all 0.3s ease;
+}
+
+#toggleTheme:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-2px);
+}
+
+#toggleTheme:active {
+  transform: translateY(0) scale(0.98);
+}
+
+body.dark #toggleTheme {
+  background: rgba(30, 41, 59, 0.55);
+}
+
+body.dark #toggleTheme:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
+#toggleTheme:active {
+  transform: translateY(0);
+}
 
 .container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 25px;
-  margin-top: 30px;
-  padding-bottom: 50px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 30px;
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
 }
+
 .card {
   background: var(--card-bg);
-  backdrop-filter: blur(8px);
-  width: 420px;
-  border-radius: 16px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  padding: 20px 25px;
-  transition: transform 0.3s, box-shadow 0.3s;
-  text-align: center;
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
 }
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+  opacity: 0.9;
+}
+
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(99, 102, 241, 0.3);
 }
-h2 { color: var(--primary-dark); margin-bottom: 10px; }
+
+.card h2 {
+  color: var(--text);
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+/* Ensure all text in cards uses theme colors */
+.card p, .card span, .card div {
+  color: var(--text);
+}
+
+/* Exception for interactive elements */
+.card button span {
+  color: white;
+}
+
 textarea {
-  width: 100%; height: 80px;
-  border-radius: 8px; border: 1px solid #ccc;
-  padding: 10px; font-size: 15px;
+  width: 100%;
+  height: 100px;
+  border-radius: 16px;
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  padding: 16px;
+  font-size: 16px;
   resize: none;
+  background: var(--input-bg);
+  color: var(--text);
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
+
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  background: var(--input-bg);
+}
+
 button {
-  background: var(--primary-dark);
-  color: white; border: none; border-radius: 8px;
-  padding: 10px 18px; margin-top: 12px;
-  cursor: pointer; font-size: 15px;
-  transition: background 0.2s;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 28px;
+  margin-top: 16px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
-button:hover { background: var(--primary); }
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+button:hover {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 video {
-  width: 100%; border-radius: 12px;
-  margin-top: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  border-radius: 16px;
+  margin-top: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: #000;
 }
-.table-wrapper {
-  max-height: 180px; overflow-y: auto; margin-top: 10px;
-}
-table { width: 100%; border-collapse: collapse; }
-th, td {
-  border: 1px solid #ccc; padding: 6px; text-align: center;
-}
-th { background: #f0faff; }
-.bar {
-  height: 8px; border-radius: 5px;
-  background: var(--primary);
-  transition: width 0.5s ease-in-out;
-}
-.conf-ring {
-  margin: 15px auto;
-  width: 90px; height: 90px;
-  border-radius: 50%;
-  background: conic-gradient(var(--primary-dark) calc(var(--p) * 1%), #ccc 0);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px;
-}
-#history {
-  width: 90%;
-  margin: 20px auto;
-  background: var(--card-bg);
-  border-radius: 14px;
+
+.results-section {
+  margin-top: 24px;
   padding: 20px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2);
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 16px;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  backdrop-filter: blur(10px);
 }
+
+.conf-ring-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.conf-ring {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(var(--primary) calc(var(--p) * 1%), rgba(107, 114, 128, 0.2) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  position: relative;
+  transition: all 0.5s ease;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+}
+
+.conf-ring::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: var(--card-bg);
+  border-radius: 50%;
+}
+
+.conf-ring span {
+  position: relative;
+  z-index: 1;
+}
+
+.emotion-label {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 16px 0;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Ensure emotion label stands out */
+.emotion-label span {
+  color: var(--primary);
+}
+
+.probability-bars {
+  margin-top: 20px;
+}
+
+.prob-item {
+  margin-bottom: 12px;
+}
+
+.prob-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* Ensure probability text is always visible */
+.prob-label span {
+  color: var(--text);
+}
+
+.prob-bar-bg {
+  height: 10px;
+  background: rgba(107, 114, 128, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.prob-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0;
+}
+
+#history {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.history-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.history-header h2 {
+  color: var(--text);
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Ensure history section text is visible */
+.history-card h2, .history-card span, .history-card div {
+  color: var(--text);
+}
+
 #clearBtn {
-  background: #e63946;
-  margin-top: 10px;
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+  width: auto;
+  margin-top: 0;
+  padding: 12px 24px;
 }
-#clearBtn:hover { background: #b22234; }
-@media (max-width: 900px){ .card { width: 90%; } }
+
+#clearBtn:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.table-wrapper {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 12px;
+  background: var(--table-bg);
+  backdrop-filter: blur(10px);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  background: var(--primary);
+  color: #ffffff;
+  z-index: 1;
+}
+
+th, td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(107, 114, 128, 0.15);
+  color: var(--text);
+}
+
+th {
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff !important;
+}
+
+tbody tr {
+  transition: all 0.2s ease;
+}
+
+tbody tr:hover {
+  background: rgba(99, 102, 241, 0.08);
+  transform: scale(1.01);
+}
+
+/* Ensure all text uses theme-aware colors */
+body {
+  color: var(--text);
+}
+
+/* Card content should always be visible */
+.card * {
+  color: var(--text);
+}
+
+/* Except for specific colored elements */
+.card button, .card button * {
+  color: white !important;
+}
+
+/* History section visibility */
+.history-card * {
+  color: var(--text);
+}
+
+/* Results section - emotion labels */
+.emotion-label {
+  color: var(--text) !important;
+}
+
+/* Table headers stay white on purple background */
+thead, thead * {
+  color: #ffffff !important;
+}
+
+/* All other table text follows theme */
+tbody td {
+  color: var(--text);
+}
+
+/* Confidence values in primary color */
+tbody td:last-child {
+  color: var(--primary);
+}
+
+td:last-child {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.status-indicator.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.status-indicator.inactive {
+  background: rgba(107, 114, 128, 0.1);
+  color: var(--text-light);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+  
+  header h1 {
+    font-size: 2rem;
+  }
+  
+  .card {
+    width: 100%;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Table wrapper improvements for dark mode */
+.table-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
 </style>
 </head>
 <body>
-<header>Emotion Recognition Dashboard 🌤️</header>
-<button id="toggleTheme">🌙 Dark Mode</button>
+<div class="bg-particles" id="bgParticles"></div>
+
+<button id="toggleTheme">
+  <span>🌙</span>
+  <span>Dark Mode</span>
+</button>
+
+<header>
+  <h1>🧠 Emotion Recognition AI - Facial Expressions and Text</h1>
+  <p>Advanced Dual-Modal Emotion Detection System</p>
+</header>
 
 <div class="container">
+  <!-- Text Emotion Card -->
   <div class="card">
-    <h2>📝 Text Emotion</h2>
-    <textarea id="textInput" placeholder="Type something..."></textarea><br>
-    <button id="textBtn">Analyze Text</button>
-    <div class="conf-ring" id="textRing" style="--p:0">💬</div>
-    <p><b>Emotion:</b> <span id="textLabel">-</span></p>
-    <div class="table-wrapper">
-      <table><thead><tr><th>Emotion</th><th>Confidence</th></tr></thead><tbody id="textProbs"></tbody></table>
+    <h2>💬 Text Emotion Analysis</h2>
+    <textarea id="textInput" placeholder="Type or paste your text here to analyze emotions..."></textarea>
+    <button id="textBtn">
+      <span>✨ Analyze Emotion</span>
+    </button>
+    
+    <div class="results-section" id="textResults" style="display: none;">
+      <div class="conf-ring-container">
+        <div class="conf-ring" id="textRing" style="--p:0"><span>💬</span></div>
+      </div>
+      <div class="emotion-label" id="textLabel">-</div>
+      <div class="probability-bars" id="textProbs"></div>
     </div>
   </div>
 
+  <!-- Facial Emotion Card -->
   <div class="card">
-    <h2>📷 Facial Emotion (Webcam)</h2>
-    <video id="video" autoplay muted playsinline></video><br>
-    <button id="imgBtn">▶️ Start Live Detection</button>
-    <div class="conf-ring" id="imgRing" style="--p:0">😐</div>
-    <p><b>Emotion:</b> <span id="imgLabel">-</span></p>
+    <h2>📷 Facial Emotion Detection</h2>
+    <div class="status-indicator inactive" id="webcamStatus">
+      <span>●</span>
+      <span>Webcam Offline</span>
+    </div>
+    <video id="video" autoplay muted playsinline></video>
+    <button id="imgBtn">
+      <span>▶️ Start Live Detection</span>
+    </button>
+    
+    <div class="results-section" id="imgResults" style="display: none;">
+      <div class="conf-ring-container">
+        <div class="conf-ring" id="imgRing" style="--p:0"><span>😐</span></div>
+      </div>
+      <div class="emotion-label" id="imgLabel">-</div>
+    </div>
   </div>
 </div>
 
 <div id="history">
-  <h2>📜 Emotion History</h2>
-  <button id="clearBtn">🧹 Clear History</button>
-  <table>
-    <thead><tr><th>Time</th><th>Source</th><th>Emotion</th><th>Confidence</th></tr></thead>
-    <tbody id="historyBody"></tbody>
-  </table>
+  <div class="history-card">
+    <div class="history-header">
+      <h2>📜 Detection History</h2>
+      <button id="clearBtn">🧹 Clear All</button>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>⏰ Time</th>
+            <th>📊 Source</th>
+            <th>😊 Emotion</th>
+            <th>📈 Confidence</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
-const toggle=document.getElementById('toggleTheme');
-let dark=false;
-toggle.onclick=()=>{dark=!dark;document.body.classList.toggle('dark');
-toggle.textContent=dark?'☀️ Light Mode':'🌙 Dark Mode';};
-
-// webcam setup
-const video=document.getElementById("video");
-navigator.mediaDevices.getUserMedia({video:true}).then(s=>video.srcObject=s);
-
-function updateRing(id, p){
-  const ring=document.getElementById(id);
-  ring.style.setProperty("--p", (p*100).toFixed(1));
-}
-function addHistory(src, label, conf){
-  const t=new Date().toLocaleTimeString();
-  const row=document.createElement("tr");
-  row.innerHTML=`<td>${t}</td><td>${src}</td><td>${label}</td><td>${(conf*100).toFixed(1)}%</td>`;
-  document.getElementById("historyBody").prepend(row);
+// Create animated background particles
+const particlesContainer = document.getElementById('bgParticles');
+for (let i = 0; i < 20; i++) {
+  const particle = document.createElement('div');
+  particle.className = 'particle';
+  particle.style.left = Math.random() * 100 + '%';
+  particle.style.width = particle.style.height = (Math.random() * 20 + 10) + 'px';
+  particle.style.animationDelay = Math.random() * 20 + 's';
+  particlesContainer.appendChild(particle);
 }
 
-document.getElementById("clearBtn").onclick=()=>{document.getElementById("historyBody").innerHTML="";};
+// Theme toggle with localStorage persistence
+const toggle = document.getElementById('toggleTheme');
+let dark = localStorage.getItem('theme') === 'dark';
 
-async function analyzeText(){
-  const txt=document.getElementById("textInput").value.trim();
-  if(!txt){alert("Enter text!");return;}
-  document.getElementById("textLabel").textContent="...";
-  const r=await fetch("/predict_text",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:txt})});
-  const d=await r.json();
-  const em=d.label||"-";
-  const emoji={"angry":"😡","anger":"😡","disgust":"🤢","fear":"😱","happy":"😊","joy":"😊","love":"❤️","neutral":"😐","sad":"😢","sadness":"😢","surprise":"😲"}[em]||"";
-  document.getElementById("textLabel").textContent=em+" "+emoji;
-  const maxP=Math.max(...d.probs);
-  updateRing("textRing",maxP);
-  const tb=document.getElementById("textProbs");
-  tb.innerHTML="";
-  d.classes.forEach((c,i)=>{
-    const tr=document.createElement("tr");
-    const w=(d.probs[i]*100).toFixed(1);
-    tr.innerHTML=`<td>${c}</td><td><div class='bar' style='width:${w}%;'></div> ${w}%</td>`;
-    tb.appendChild(tr);
-  });
-  addHistory("Text", em+" "+emoji, maxP);
+// Apply saved theme on load
+if (dark) {
+  document.body.classList.add('dark');
+  toggle.innerHTML = '<span>☀️</span><span>Light Mode</span>';
 }
 
-async function analyzeImage(auto=false){
-  const canvas=document.createElement("canvas");
-  canvas.width=video.videoWidth;canvas.height=video.videoHeight;
-  canvas.getContext("2d").drawImage(video,0,0);
-  const blob=await new Promise(r=>canvas.toBlob(r,"image/jpeg",0.8));
-  const fd=new FormData();fd.append("file",blob,"frame.jpg");
-  const res=await fetch("/predict_image",{method:"POST",body:fd});
-  const d=await res.json();
-  if(d.error)return;
-  const em=d.label||"-";
-  const emoji={"angry":"😡","disgust":"🤢","fear":"😱","happy":"😊","neutral":"😐","sad":"😢","surprise":"😲"}[em]||"";
-  document.getElementById("imgLabel").textContent=em+" "+emoji;
-  const maxP=Math.max(...d.probs);
-  updateRing("imgRing",maxP);
-  addHistory("Webcam", em+" "+emoji, maxP);
+// Smooth theme transition
+toggle.onclick = () => {
+  dark = !dark;
+  document.body.classList.toggle('dark');
+  toggle.innerHTML = dark ? '<span>☀️</span><span>Light Mode</span>' : '<span>🌙</span><span>Dark Mode</span>';
+  
+  // Save preference
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+  
+  // Add subtle animation
+  toggle.style.transform = 'scale(0.95)';
+  setTimeout(() => {
+    toggle.style.transform = '';
+  }, 150);
+};
+
+// Webcam setup
+const video = document.getElementById('video');
+const webcamStatus = document.getElementById('webcamStatus');
+let webcamStream = null;
+
+async function initWebcam() {
+  try {
+    webcamStream = await navigator.mediaDevices.getUserMedia({ 
+      video: { 
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+        facingMode: 'user'
+      } 
+    });
+    video.srcObject = webcamStream;
+    webcamStatus.className = 'status-indicator active';
+    webcamStatus.innerHTML = '<span>●</span><span>Webcam Active</span>';
+  } catch (err) {
+    console.error('Webcam error:', err);
+    webcamStatus.className = 'status-indicator inactive';
+    webcamStatus.innerHTML = '<span>●</span><span>Webcam Error</span>';
+  }
 }
 
-let live=false,interval;
-document.getElementById("imgBtn").onclick=()=>{
-  live=!live;
-  if(live){
-    document.getElementById("imgBtn").textContent="⏹ Stop Live Detection";
-    analyzeImage(true);
-    interval=setInterval(()=>analyzeImage(true),2000);
-  }else{
-    document.getElementById("imgBtn").textContent="▶️ Start Live Detection";
+initWebcam();
+
+function updateRing(id, p) {
+  const ring = document.getElementById(id);
+  ring.style.setProperty('--p', Math.min(Math.max(p * 100, 0), 100).toFixed(1));
+}
+
+function addHistory(src, label, conf) {
+  const t = new Date().toLocaleTimeString();
+  const row = document.createElement('tr');
+  row.innerHTML = `<td>${t}</td><td>${src}</td><td>${label}</td><td>${(conf * 100).toFixed(1)}%</td>`;
+  const tbody = document.getElementById('historyBody');
+  tbody.insertBefore(row, tbody.firstChild);
+  
+  // Keep only last 50 entries
+  while (tbody.children.length > 50) {
+    tbody.removeChild(tbody.lastChild);
+  }
+}
+
+document.getElementById('clearBtn').onclick = () => {
+  document.getElementById('historyBody').innerHTML = '';
+};
+
+async function analyzeText() {
+  const txt = document.getElementById('textInput').value.trim();
+  if (!txt) {
+    alert('Please enter some text!');
+    return;
+  }
+  
+  const btn = document.getElementById('textBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span> Analyzing...';
+  
+  document.getElementById('textResults').style.display = 'block';
+  document.getElementById('textLabel').textContent = 'Analyzing...';
+  document.getElementById('textRing').style.setProperty('--p', 0);
+  
+  try {
+    const r = await fetch('/predict_text', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text: txt})
+    });
+    
+    const d = await r.json();
+    
+    if (d.error) {
+      throw new Error(d.error);
+    }
+    
+    const em = d.label || '-';
+    const emojiMap = {
+      'angry': '😡', 'anger': '😡',
+      'disgust': '🤢',
+      'fear': '😱',
+      'happy': '😊', 'joy': '😊',
+      'love': '❤️',
+      'neutral': '😐',
+      'sad': '😢', 'sadness': '😢',
+      'surprise': '😲', 'surprised': '😲'
+    };
+    const emoji = emojiMap[em.toLowerCase()] || '❓';
+    
+    document.getElementById('textLabel').textContent = `${em} ${emoji}`;
+    const maxP = Math.max(...d.probs);
+    updateRing('textRing', maxP);
+    
+    // Update probability bars
+    const tb = document.getElementById('textProbs');
+    tb.innerHTML = '';
+    
+    // Sort by probability
+    const sorted = d.classes.map((c, i) => ({class: c, prob: d.probs[i]}))
+      .sort((a, b) => b.prob - a.prob);
+    
+    sorted.forEach(item => {
+      const pct = (item.prob * 100).toFixed(1);
+      const div = document.createElement('div');
+      div.className = 'prob-item';
+      div.innerHTML = `
+        <div class="prob-label">
+          <span>${item.class}</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="prob-bar-bg">
+          <div class="prob-bar-fill" style="width: ${pct}%"></div>
+        </div>
+      `;
+      tb.appendChild(div);
+    });
+    
+    addHistory('Text', `${em} ${emoji}`, maxP);
+  } catch (err) {
+    console.error('Text analysis error:', err);
+    document.getElementById('textLabel').textContent = 'Error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>✨ Analyze Emotion</span>';
+  }
+}
+
+async function analyzeImage() {
+  if (!video.videoWidth) return;
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  
+  const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.8));
+  const fd = new FormData();
+  fd.append('file', blob, 'frame.jpg');
+  
+  try {
+    const res = await fetch('/predict_image', {method: 'POST', body: fd});
+    const d = await res.json();
+    
+    if (d.error) {
+      throw new Error(d.error);
+    }
+    
+    document.getElementById('imgResults').style.display = 'block';
+    const em = d.label || '-';
+    const emojiMap = {
+      'angry': '😡',
+      'disgust': '🤢',
+      'fear': '😱',
+      'happy': '😊',
+      'neutral': '😐',
+      'sad': '😢',
+      'surprise': '😲'
+    };
+    const emoji = emojiMap[em.toLowerCase()] || '❓';
+    
+    document.getElementById('imgLabel').textContent = `${em} ${emoji}`;
+    const maxP = Math.max(...d.probs);
+    updateRing('imgRing', maxP);
+    
+    addHistory('Webcam', `${em} ${emoji}`, maxP);
+  } catch (err) {
+    console.error('Image analysis error:', err);
+  }
+}
+
+let live = false, interval;
+const imgBtn = document.getElementById('imgBtn');
+
+imgBtn.onclick = () => {
+  live = !live;
+  if (live) {
+    imgBtn.innerHTML = '<span>⏹ Stop Detection</span>';
+    document.getElementById('imgResults').style.display = 'block';
+    analyzeImage();
+    interval = setInterval(() => analyzeImage(), 2000);
+  } else {
+    imgBtn.innerHTML = '<span>▶️ Start Live Detection</span>';
     clearInterval(interval);
   }
 };
 
-document.getElementById("textBtn").onclick=analyzeText;
+document.getElementById('textBtn').onclick = analyzeText;
+
+// Keyboard shortcut
+document.getElementById('textInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && e.ctrlKey) {
+    analyzeText();
+  }
+});
 </script>
 </body>
 </html>

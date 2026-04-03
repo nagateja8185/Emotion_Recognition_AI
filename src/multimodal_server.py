@@ -15,10 +15,12 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 
-# ---------- CONFIG ----------
-MODEL_IMG_PATH = r"C:\emotion_detection_project\models\image_emotion.h5"
-MODEL_TEXT_PIPELINE = r"C:\emotion_detection_project\models\text_emotion\pipeline.joblib"
-TRAIN_IMAGE_DIR = r"C:\emotion_detection_project\data\images\fer2013\train"
+# ---------- AUTO-DETECT PATHS (Cross-Platform) ----------
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+MODEL_IMG_PATH = os.path.join(BASE_DIR, "models", "image_emotion.h5")
+MODEL_TEXT_PIPELINE = os.path.join(BASE_DIR, "models", "text_emotion", "pipeline.joblib")
+TRAIN_IMAGE_DIR = os.path.join(BASE_DIR, "data", "images", "fer2013", "train")
+WEB_DEMO_DIR = os.path.join(BASE_DIR, "web_demo")
 PORT = 8000
 # ----------------------------
 
@@ -63,7 +65,10 @@ class EmotionHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path in ["/", "/index.html"]:
-            index_path = os.path.join(os.path.dirname(__file__), "..", "web_demo", "index.html")
+            index_path = os.path.join(WEB_DEMO_DIR, "index.html")
+            if not os.path.exists(index_path):
+                self.send_error(500, f"HTML file not found: {index_path}")
+                return
             with open(index_path, "rb") as f:
                 content = f.read()
             self.send_response(200)
@@ -82,18 +87,21 @@ class EmotionHandler(BaseHTTPRequestHandler):
             self.send_error(404)
 
     def handle_text(self):
-        length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(length)
-        data = json.loads(body.decode())
-        text = data.get("text", "")
-        if not text:
-            self._json(400, {"error": "No text provided"})
-            return
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length)
+            data = json.loads(body.decode())
+            text = data.get("text", "")
+            if not text:
+                self._json(400, {"error": "No text provided"})
+                return
 
-        pred = self.server.text_model.predict([text])[0]
-        probs = self.server.text_model.predict_proba([text])[0].tolist()
-        classes = list(self.server.text_model.classes_)
-        self._json(200, {"label": pred, "probs": probs, "classes": classes})
+            pred = self.server.text_model.predict([text])[0]
+            probs = self.server.text_model.predict_proba([text])[0].tolist()
+            classes = list(self.server.text_model.classes_)
+            self._json(200, {"label": pred, "probs": probs, "classes": classes})
+        except Exception as e:
+            self._json(500, {"error": f"Text prediction error: {str(e)}"})
 
     def handle_image(self):
         """Handle webcam frame upload robustly across browsers."""
@@ -139,10 +147,32 @@ class EmotionHandler(BaseHTTPRequestHandler):
 
 def run(port=PORT):
     print("Loading models...")
-    img_model = load_model(MODEL_IMG_PATH)
-    text_model = joblib.load(MODEL_TEXT_PIPELINE)
-    img_labels = load_image_labels()
-    print(f"✅ Server running at http://localhost:{port}")
+    
+    # Validate model files exist
+    if not os.path.exists(MODEL_IMG_PATH):
+        print(f"❌ Image model not found: {MODEL_IMG_PATH}")
+        print("   Please run: python src/train_image.py")
+        return
+    
+    if not os.path.exists(MODEL_TEXT_PIPELINE):
+        print(f"❌ Text model not found: {MODEL_TEXT_PIPELINE}")
+        print("   Please run: python src/train_text.py")
+        return
+    
+    try:
+        img_model = load_model(MODEL_IMG_PATH)
+        text_model = joblib.load(MODEL_TEXT_PIPELINE)
+        img_labels = load_image_labels()
+    except Exception as e:
+        print(f"❌ Error loading models: {e}")
+        return
+    
+    print(f"✅ Models loaded successfully!")
+    print(f"   - Image model: {MODEL_IMG_PATH}")
+    print(f"   - Text model: {MODEL_TEXT_PIPELINE}")
+    print(f"   - Image labels: {img_labels}")
+    print(f"\n🚀 Server running at http://localhost:{port}")
+    print(f"   Open in browser: http://localhost:{port}\n")
 
     server = ThreadingHTTPServer(("", port), EmotionHandler)
     server.img_model = img_model
@@ -151,7 +181,7 @@ def run(port=PORT):
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("Shutting down...")
+        print("\n🛑 Shutting down...")
         server.server_close()
 
 
